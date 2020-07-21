@@ -8,7 +8,7 @@ import (
 
 func Router() http.Handler {
 	r := chi.NewRouter()
-	r.Get("/sendMail", SendMailHandler)
+	r.Post("/sendMail", SendMailHandler)
 	r.NotFound(NotFound)
 	return r
 }
