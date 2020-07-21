@@ -1,17 +1,20 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 
+	_ "github.com/lib/pq"
 	"github.com/ndv6/tnotif/api"
 )
 
 type Config struct {
-	Addr string `json:"addr"`
+	Addr     string `json:"addr"`
+	Database string `json:"database"`
 }
 
 func main() {
@@ -20,8 +23,9 @@ func main() {
 		log.Fatal("unable to load configuration config.json")
 	}
 
+	db, err := sql.Open("postgres", cfg.Database)
 	fmt.Println("Serving at port :8082")
-	err = http.ListenAndServe(cfg.Addr, api.Router())
+	err = http.ListenAndServe(cfg.Addr, api.Router(db))
 	if err != nil {
 		log.Fatal(err)
 	}
