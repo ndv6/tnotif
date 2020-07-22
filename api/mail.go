@@ -42,6 +42,7 @@ func SendMailHandler(db string) http.HandlerFunc {
 		err := json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
 			fmt.Fprint(w, fmt.Sprintf("%v", err))
+			return
 		}
 
 		sender := smtpEmail{
