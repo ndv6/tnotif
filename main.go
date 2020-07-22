@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/ndv6/tnotif/api"
 )
 
 type Config struct {
@@ -19,7 +21,7 @@ func main() {
 	}
 
 	fmt.Println("Serving at port :8082")
-	err = http.ListenAndServe(cfg.Addr, Router)
+	err = http.ListenAndServe(cfg.Addr, api.Router())
 	if err != nil {
 		log.Fatal(err)
 	}
