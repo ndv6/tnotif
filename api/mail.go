@@ -1,12 +1,13 @@
 package api
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/smtp"
 	"time"
+
+	"github.com/ndv6/tnotif/api/storage"
 
 	"github.com/ndv6/tnotif/helper"
 	"github.com/ndv6/tnotif/models"
@@ -31,7 +32,7 @@ func (s *smtpServer) getAddress() string {
 	return s.Host + ":" + s.Port
 }
 
-func SendMailHandler(db *sql.DB) http.HandlerFunc {
+func SendMailHandler(db string) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var req smtpRequest
 		err := json.NewDecoder(r.Body).Decode(&req)
@@ -61,24 +62,22 @@ func SendMailHandler(db *sql.DB) http.HandlerFunc {
 			fmt.Fprint(w, fmt.Sprintf("%v", err))
 			return
 		}
-
-		for _, e := range to {
-			err = LogMail(e, db)
-			if err != nil {
-				fmt.Fprint(w, "Cannot log the sent email")
-				return
-			}
+		database := storage.GetStorage(db)
+		err = LogMail(req.Email, database)
+		if err != nil {
+			fmt.Fprint(w, "Cannot log the sent email")
+			return
 		}
 		return
 	})
 }
 
-func LogMail(email string, db *sql.DB) error {
+func LogMail(email string, db storage.Storage) error {
 	logMail := models.LogMail{
 		Email:  email,
 		SentAt: time.Now(),
 	}
-	_, err := db.Exec("INSERT INTO log_mail(email, sent_at) VALUES ($1, $2)", logMail.Email, logMail.SentAt)
+	err := db.Create(logMail)
 	if err != nil {
 		return err
 	}
