@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/ndv6/tnotif/helper"
+	"github.com/ndv6/tnotif/models"
 )
 
 type smtpServer struct {
@@ -69,6 +70,10 @@ func SendMailHandler(db *sql.DB) http.HandlerFunc {
 }
 
 func LogMail(email string, db *sql.DB) error {
-	_, err := db.Exec("INSERT INTO log_mail(email, sent_at) VALUES ($1, $2)", email, time.Now())
+	logMail := models.LogMail{
+		Email:  email,
+		SentAt: time.Now(),
+	}
+	_, err := db.Exec("INSERT INTO log_mail(email, sent_at) VALUES ($1, $2)", logMail.Email, logMail.SentAt)
 	return err
 }
