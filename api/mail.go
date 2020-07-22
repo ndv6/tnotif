@@ -63,7 +63,11 @@ func SendMailHandler(db *sql.DB) http.HandlerFunc {
 		}
 
 		for _, e := range to {
-			LogMail(e, db)
+			err = LogMail(e, db)
+			if err != nil {
+				fmt.Fprint(w, "Cannot log the sent email")
+				return
+			}
 		}
 		return
 	})
@@ -75,5 +79,8 @@ func LogMail(email string, db *sql.DB) error {
 		SentAt: time.Now(),
 	}
 	_, err := db.Exec("INSERT INTO log_mail(email, sent_at) VALUES ($1, $2)", logMail.Email, logMail.SentAt)
+	if err != nil {
+		return err
+	}
 	return err
 }
