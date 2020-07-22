@@ -23,9 +23,13 @@ type smtpEmail struct {
 	Password string
 }
 
-type smtpRequest struct {
+type SmtpRequest struct {
 	Email string `json:"email"`
 	Token string `json:"token"`
+}
+
+type SmtpResponse struct {
+	Email string `json:"email"`
 }
 
 func (s *smtpServer) getAddress() string {
@@ -34,7 +38,7 @@ func (s *smtpServer) getAddress() string {
 
 func SendMailHandler(db string) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var req smtpRequest
+		var req SmtpRequest
 		err := json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
 			fmt.Fprint(w, fmt.Sprintf("%v", err))
@@ -66,6 +70,15 @@ func SendMailHandler(db string) http.HandlerFunc {
 		err = LogMail(req.Email, database)
 		if err != nil {
 			fmt.Fprint(w, "Cannot log the sent email")
+			return
+		}
+		resp := SmtpResponse{
+			Email: req.Email,
+		}
+
+		err = json.NewEncoder(w).Encode(resp)
+		if err != nil {
+			fmt.Fprint(w, "Unable to encode response")
 			return
 		}
 		return
