@@ -1,9 +1,11 @@
 package api
 
 import (
+	"bytes"
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"net/http"
 	"net/smtp"
 	"time"
@@ -25,6 +27,10 @@ type smtpEmail struct {
 type smtpRequest struct {
 	Email string `json:"email"`
 	Token string `json:"token"`
+}
+
+type templateData struct {
+	Token string
 }
 
 func (s *smtpServer) getAddress() string {
@@ -53,7 +59,16 @@ func SendMailHandler(db *sql.DB) http.HandlerFunc {
 			Port: "587",
 		}
 
-		message := []byte(req.Token)
+		data := templateData{
+			Token: req.Token,
+		}
+
+		subject := "Please verify your email"
+		body, err := ParseTemplate("templates/template.html", data)
+		if err != nil {
+			fmt.Fprint(w, "cannot parse email template")
+		}
+		message := CreateEmailMessage(subject, body)
 
 		auth := smtp.PlainAuth("", sender.Email, sender.Password, server.Host)
 		err = smtp.SendMail(server.getAddress(), auth, sender.Email, to, message)
@@ -76,4 +91,26 @@ func LogMail(email string, db *sql.DB) error {
 	}
 	_, err := db.Exec("INSERT INTO log_mail(email, sent_at) VALUES ($1, $2)", logMail.Email, logMail.SentAt)
 	return err
+}
+
+func ParseTemplate(filename string, data interface{}) (string, error) {
+	t, err := template.ParseFiles(filename)
+	if err != nil {
+		return "", err
+	}
+
+	buf := new(bytes.Buffer)
+	err = t.Execute(buf, data)
+	if err != nil {
+		return "", err
+	}
+
+	return buf.String(), err
+}
+
+func CreateEmailMessage(subject string, body string) []byte {
+	subject = "Subject: " + subject
+	MIME := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
+	message := []byte(subject + "\n" + MIME + "\n" + body)
+	return message
 }
