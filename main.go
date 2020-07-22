@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -23,9 +22,8 @@ func main() {
 		log.Fatal("unable to load configuration config.json")
 	}
 
-	db, err := sql.Open("postgres", cfg.Database)
 	fmt.Println("Serving at port :8082")
-	err = http.ListenAndServe(cfg.Addr, api.Router(db))
+	err = http.ListenAndServe(cfg.Addr, api.Router())
 	if err != nil {
 		log.Fatal(err)
 	}
