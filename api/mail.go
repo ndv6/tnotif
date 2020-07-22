@@ -42,7 +42,8 @@ func SendMailHandler(db *sql.DB) http.HandlerFunc {
 		var req smtpRequest
 		err := json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
-			fmt.Fprint(w, fmt.Sprintf("%v", err))
+			helper.HTTPError(w, http.StatusBadRequest, "Cannot parse request")
+			return
 		}
 
 		sender := smtpEmail{
@@ -66,20 +67,23 @@ func SendMailHandler(db *sql.DB) http.HandlerFunc {
 		subject := "Please verify your email"
 		body, err := ParseTemplate("templates/template.html", data)
 		if err != nil {
-			fmt.Fprint(w, "cannot parse email template")
+			helper.HTTPError(w, http.StatusBadRequest, "Cannot parse email template")
+			return
 		}
 		message := CreateEmailMessage(subject, body)
 
 		auth := smtp.PlainAuth("", sender.Email, sender.Password, server.Host)
 		err = smtp.SendMail(server.getAddress(), auth, sender.Email, to, message)
 		if err != nil {
-			fmt.Fprint(w, fmt.Sprintf("%v", err))
+			helper.HTTPError(w, http.StatusBadRequest, "Failed to send mail")
 			return
 		}
 
 		for _, e := range to {
 			LogMail(e, db)
 		}
+
+		fmt.Fprint(w, "Email sent successfuly")
 		return
 	})
 }
