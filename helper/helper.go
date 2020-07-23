@@ -19,6 +19,7 @@ func GetEnv(varName string) string {
 }
 
 func HTTPError(w http.ResponseWriter, status int, errorMessage string) {
+	w.WriteHeader(status)
 	json.NewEncoder(w).Encode(map[string]string{"error": errorMessage})
 }
 
