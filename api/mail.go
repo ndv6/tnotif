@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"log"
 	"net/http"
 	"net/smtp"
 	"time"
@@ -14,36 +15,23 @@ import (
 	"github.com/ndv6/tnotif/models"
 )
 
-type smtpServer struct {
-	Host string
-	Port string
-}
-
 type smtpEmail struct {
 	Email    string
 	Password string
-}
-
-type SmtpRequest struct {
-	Email string `json:"email"`
-	Token string `json:"token"`
 }
 
 type templateData struct {
 	Token string
 }
 
-type SmtpResponse struct {
-	Email string `json:"email"`
+type SmtpService struct {
+	Server   SmtpServer
+	Template string
 }
 
-func (s *smtpServer) getAddress() string {
-	return s.Host + ":" + s.Port
-}
-
-func SendMailHandler(db string) http.HandlerFunc {
+func (ss *SmtpService) SendMailHandler(db string) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var req SmtpRequest
+		var req models.SmtpRequest
 		err := json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
 			helper.HTTPError(w, http.StatusBadRequest, "Cannot parse request")
@@ -59,11 +47,6 @@ func SendMailHandler(db string) http.HandlerFunc {
 			req.Email,
 		}
 
-		server := smtpServer{
-			Host: "smtp.gmail.com",
-			Port: "587",
-		}
-
 		data := templateData{
 			Token: req.Token,
 		}
@@ -71,13 +54,14 @@ func SendMailHandler(db string) http.HandlerFunc {
 		subject := "Please verify your email"
 		body, err := ParseTemplate("templates/template.html", data)
 		if err != nil {
+			log.Print(err)
 			helper.HTTPError(w, http.StatusBadRequest, "Cannot parse email template")
 			return
 		}
 		message := CreateEmailMessage(subject, body)
 
-		auth := smtp.PlainAuth("", sender.Email, sender.Password, server.Host)
-		err = smtp.SendMail(server.getAddress(), auth, sender.Email, to, message)
+		auth := smtp.PlainAuth("", sender.Email, sender.Password, ss.Server.Host)
+		err = smtp.SendMail(ss.Server.getAddress(), auth, sender.Email, to, message)
 		if err != nil {
 			helper.HTTPError(w, http.StatusBadRequest, "Failed to send mail")
 			return
@@ -88,7 +72,7 @@ func SendMailHandler(db string) http.HandlerFunc {
 			fmt.Fprint(w, "Cannot log the sent email")
 			return
 		}
-		resp := SmtpResponse{
+		resp := models.SmtpResponse{
 			Email: req.Email,
 		}
 
