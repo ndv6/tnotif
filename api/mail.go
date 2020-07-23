@@ -2,7 +2,6 @@ package api
 
 import (
 	"bytes"
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -10,6 +9,7 @@ import (
 	"net/smtp"
 	"time"
 
+	"github.com/ndv6/tnotif/api/storage"
 	"github.com/ndv6/tnotif/helper"
 	"github.com/ndv6/tnotif/models"
 )
@@ -24,7 +24,7 @@ type smtpEmail struct {
 	Password string
 }
 
-type smtpRequest struct {
+type SmtpRequest struct {
 	Email string `json:"email"`
 	Token string `json:"token"`
 }
@@ -33,13 +33,17 @@ type templateData struct {
 	Token string
 }
 
+type SmtpResponse struct {
+	Email string `json:"email"`
+}
+
 func (s *smtpServer) getAddress() string {
 	return s.Host + ":" + s.Port
 }
 
-func SendMailHandler(db *sql.DB) http.HandlerFunc {
+func SendMailHandler(db string) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var req smtpRequest
+		var req SmtpRequest
 		err := json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
 			helper.HTTPError(w, http.StatusBadRequest, "Cannot parse request")
@@ -78,26 +82,39 @@ func SendMailHandler(db *sql.DB) http.HandlerFunc {
 			helper.HTTPError(w, http.StatusBadRequest, "Failed to send mail")
 			return
 		}
+		database := storage.GetStorage(db)
+		err = LogMail(req.Email, database)
+		if err != nil {
+			fmt.Fprint(w, "Cannot log the sent email")
+			return
+		}
+		resp := SmtpResponse{
+			Email: req.Email,
+		}
 
 		for _, e := range to {
-			err = LogMail(e, db)
+			err = LogMail(e, database)
 			if err != nil {
 				helper.HTTPError(w, http.StatusBadRequest, "Can not log send mail")
 				return
 			}
 		}
 
-		fmt.Fprint(w, "Email sent successfuly")
+		err = json.NewEncoder(w).Encode(resp)
+		if err != nil {
+			helper.HTTPError(w, http.StatusBadRequest, "Can not encode response")
+			return
+		}
 		return
 	})
 }
 
-func LogMail(email string, db *sql.DB) error {
+func LogMail(email string, db storage.Storage) error {
 	logMail := models.LogMail{
 		Email:  email,
 		SentAt: time.Now(),
 	}
-	_, err := db.Exec("INSERT INTO log_mail(email, sent_at) VALUES ($1, $2)", logMail.Email, logMail.SentAt)
+	err := db.Create(logMail)
 	return err
 }
 
