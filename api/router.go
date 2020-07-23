@@ -6,9 +6,9 @@ import (
 	"github.com/go-chi/chi"
 )
 
-func Router() http.Handler {
+func Router(db string) http.Handler {
 	r := chi.NewRouter()
-	r.Post("/sendMail", SendMailHandler)
+	r.Post("/sendMail", SendMailHandler(db))
 	r.NotFound(NotFound)
 	return r
 }

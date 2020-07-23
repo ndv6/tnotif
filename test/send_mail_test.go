@@ -26,7 +26,7 @@ func TestSendMail(t *testing.T) {
 	}
 
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(api.SendMailHandler)
+	handler := http.HandlerFunc(api.SendMailHandler("mock"))
 	handler.ServeHTTP(rr, req)
 
 	if rr.Code != http.StatusOK {
