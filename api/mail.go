@@ -80,7 +80,11 @@ func SendMailHandler(db *sql.DB) http.HandlerFunc {
 		}
 
 		for _, e := range to {
-			LogMail(e, db)
+			err = LogMail(e, db)
+			if err != nil {
+				helper.HTTPError(w, http.StatusBadRequest, "Can not log send mail")
+				return
+			}
 		}
 
 		fmt.Fprint(w, "Email sent successfuly")
