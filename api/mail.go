@@ -92,8 +92,5 @@ func LogMail(email string, db storage.Storage) error {
 		SentAt: time.Now(),
 	}
 	err := db.Create(logMail)
-	if err != nil {
-		return err
-	}
 	return err
 }

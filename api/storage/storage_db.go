@@ -38,7 +38,7 @@ func (o database) Create(obj models.LogMail) error {
 func (o database) List() ([]models.LogMail, error) {
 	rows, err := o.db.Query("SELECT email, sent_at FROM log_mail LIMIT 10;")
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	defer rows.Close()
@@ -48,7 +48,7 @@ func (o database) List() ([]models.LogMail, error) {
 		var sentMail models.LogMail
 		err = rows.Scan(&sentMail.Email, &sentMail.SentAt)
 		if err != nil {
-			log.Fatal(err)
+			return nil, err
 		}
 		sentMails = append(sentMails, sentMail)
 	}
