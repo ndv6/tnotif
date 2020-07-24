@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log"
 
+	dbh "github.com/ndv6/tnotif/database"
 	"github.com/ndv6/tnotif/helper"
 	"github.com/ndv6/tnotif/models"
 )
@@ -25,6 +26,12 @@ func newConnection() database {
 	if err := db.Ping(); err != nil {
 		log.Fatal(err)
 	}
+
+	err = dbh.LoadSQLFile(db, "database/log_mail.sql")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	return database{
 		db: db,
 	}
