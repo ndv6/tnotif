@@ -27,3 +27,9 @@ const (
 const (
 	JSON = "application/json"
 )
+
+// Response Messages
+const (
+	SendMailSuccess = "Send Mail success"
+	SendMailFailed  = "Send Mail failed"
+)

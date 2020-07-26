@@ -17,7 +17,11 @@ Response <br/>
 200 Ok
 ```
 {
-    "email" : "testing@example.com"
+    "status" : "SUCCESS",
+    "message" : "Send Mail Success",
+    "data" : {
+        "email" : "testing@example.com"
+    }
 }
 ```
 400 Bad Request

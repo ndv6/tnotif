@@ -80,7 +80,7 @@ func (ss *SmtpService) SendMailHandler(db string) http.HandlerFunc {
 		objResponse := models.SmtpResponse{
 			Email: req.Email,
 		}
-		_, res, err := helper.NewResponseBuilder(w, true, constants.Success, objResponse)
+		_, res, err := helper.NewResponseBuilder(w, true, constants.SendMailSuccess, objResponse)
 		if err != nil {
 			w.Header().Set(constants.ContentType, constants.JSON)
 			helper.HTTPError(w, http.StatusBadRequest, constants.CannotEncodeResponse)
