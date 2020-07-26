@@ -14,7 +14,7 @@ import (
 
 func TestSendMail(t *testing.T) {
 	bodyReq := models.SmtpRequest{
-		Email: "yuly.ocbcnisp@gmail.com",
+		Email: "testing@example.com",
 		Token: "testing",
 	}
 	reqJSON, err := json.Marshal(bodyReq)

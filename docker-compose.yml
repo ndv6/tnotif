@@ -3,9 +3,9 @@ services:
     app:
         image: golang
         command: ["go", "run", "main.go"]
-        working_dir: /Users/yuly.gunawan/workspace/tnotif
+        working_dir: /workspace/tnotif
         volumes:
-            - .:/Users/yuly.gunawan/workspace/tnotif
+            - .:/workspace/tnotif
         ports: 
             - 8082:8082
         depends_on:

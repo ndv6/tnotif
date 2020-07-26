@@ -29,6 +29,8 @@ func Router(db string) http.Handler {
 	}
 
 	r := chi.NewRouter()
+
+	// Yuly Haruka
 	r.Post("/sendMail", ss.SendMailHandler(db))
 	r.NotFound(NotFound)
 	return r

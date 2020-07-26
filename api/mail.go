@@ -5,10 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
-	"log"
 	"net/http"
 	"net/smtp"
 	"time"
+
+	"github.com/ndv6/tnotif/constants"
 
 	"github.com/ndv6/tnotif/api/storage"
 	"github.com/ndv6/tnotif/helper"
@@ -34,6 +35,7 @@ func (ss *SmtpService) SendMailHandler(db string) http.HandlerFunc {
 		var req models.SmtpRequest
 		err := json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
+			w.Header().Set(constants.ContentType, constants.JSON)
 			helper.HTTPError(w, http.StatusBadRequest, "Cannot parse request")
 			return
 		}
@@ -54,7 +56,7 @@ func (ss *SmtpService) SendMailHandler(db string) http.HandlerFunc {
 		subject := "Please verify your email"
 		body, err := ParseTemplate("templates/template.html", data)
 		if err != nil {
-			log.Print(err)
+			w.Header().Set(constants.ContentType, constants.JSON)
 			helper.HTTPError(w, http.StatusBadRequest, "Cannot parse email template")
 			return
 		}
@@ -63,32 +65,30 @@ func (ss *SmtpService) SendMailHandler(db string) http.HandlerFunc {
 		auth := smtp.PlainAuth("", sender.Email, sender.Password, ss.Server.Host)
 		err = smtp.SendMail(ss.Server.getAddress(), auth, sender.Email, to, message)
 		if err != nil {
+			w.Header().Set(constants.ContentType, constants.JSON)
 			helper.HTTPError(w, http.StatusBadRequest, "Failed to send mail")
 			return
 		}
 		database := storage.GetStorage(db)
 		err = LogMail(req.Email, database)
 		if err != nil {
-			fmt.Fprint(w, "Cannot log the sent email")
+			w.Header().Set(constants.ContentType, constants.JSON)
+			helper.HTTPError(w, http.StatusBadRequest, "Failed to log mail")
 			return
 		}
-		resp := models.SmtpResponse{
+
+		objResponse := models.SmtpResponse{
 			Email: req.Email,
 		}
-
-		for _, e := range to {
-			err = LogMail(e, database)
-			if err != nil {
-				helper.HTTPError(w, http.StatusBadRequest, "Can not log send mail")
-				return
-			}
-		}
-
-		err = json.NewEncoder(w).Encode(resp)
+		_, res, err := helper.NewResponseBuilder(w, true, constants.SendMailSuccess, objResponse)
 		if err != nil {
-			helper.HTTPError(w, http.StatusBadRequest, "Can not encode response")
+			w.Header().Set(constants.ContentType, constants.JSON)
+			helper.HTTPError(w, http.StatusBadRequest, constants.CannotEncodeResponse)
 			return
 		}
+
+		w.Header().Set(constants.ContentType, constants.JSON)
+		fmt.Fprintf(w, res)
 		return
 	})
 }
