@@ -2,8 +2,12 @@ package api
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/cors"
+	"github.com/go-chi/httprate"
 )
 
 const (
@@ -29,9 +33,18 @@ func Router(db string) http.Handler {
 	}
 
 	r := chi.NewRouter()
+	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Content-Type"},
+		AllowCredentials: true,
+	}))
 
-	// Yuly Haruka
-	r.Post("/sendMail", ss.SendMailHandler(db))
+	r.Use(httprate.LimitByIP(1, 10*time.Second))
+
+	r.Post("/sendMail", ss.SendMailHandler(db)) // Yuly Haruka
 	r.NotFound(NotFound)
 	return r
 }
