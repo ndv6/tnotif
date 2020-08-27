@@ -30,7 +30,7 @@ stages:
             inputs:
               helmVersionToInstall: 3.3.0
           - task: HelmDeploy@0
-            displayName: Helm Upgrade
+            displayName: Helm Deploy
             inputs:
               kubernetesServiceEndpoint: baitkubernetescluster
               connectionType: "Kubernetes Service Connection"
