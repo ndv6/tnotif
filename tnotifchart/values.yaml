@@ -83,8 +83,8 @@ tolerations: []
 affinity: {}
 
 environment:
-  EMAIL_ACC: ''
-  EMAIL_PASSWORD: ''
-  DB: ''
-  TELEGRAM: ''
-  CHATID: ''
+  emailAcc: ''
+  emailPassword: ''
+  db: ''
+  telegram: ''
+  chatId: ''

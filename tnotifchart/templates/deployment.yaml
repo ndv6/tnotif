@@ -35,15 +35,15 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: EMAIL_ACC
-              value: {{ .Values.environment.EMAIL_ACC}}
+              value: {{ .Values.environment.emailAcc}}
             - name: EMAIL_PASSWORD
-              value: {{ .Values.environment.EMAIL_PASSWORD}}
+              value: {{ .Values.environment.emailPassword}}
             - name: DB
-              value: {{ .Values.environment.DB}}
+              value: {{ .Values.environment.db}}
             - name: TELEGRAM
-              value: {{ .Values.environment.TELEGRAM}}
+              value: {{ .Values.environment.telegram}}
             - name: CHATID
-              value: {{ .Values.environment.CHATID}}
+              value: {{ .Values.environment.chatId}}
           ports:
             - name: http
               containerPort: 8082
