@@ -36,7 +36,7 @@ func (ss *SmtpService) SendMailHandler(db string) http.HandlerFunc {
 		err := json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
 			w.Header().Set(constants.ContentType, constants.JSON)
-			helper.HTTPError(w, http.StatusBadRequest, "Cannot parse request")
+			helper.HTTPError(r, w, http.StatusBadRequest, "Cannot parse request")
 			return
 		}
 
@@ -57,7 +57,7 @@ func (ss *SmtpService) SendMailHandler(db string) http.HandlerFunc {
 		body, err := ParseTemplate("templates/template.html", data)
 		if err != nil {
 			w.Header().Set(constants.ContentType, constants.JSON)
-			helper.HTTPError(w, http.StatusBadRequest, "Cannot parse email template")
+			helper.HTTPError(r, w, http.StatusBadRequest, "Cannot parse email template")
 			return
 		}
 		message := CreateEmailMessage(subject, body)
@@ -66,14 +66,14 @@ func (ss *SmtpService) SendMailHandler(db string) http.HandlerFunc {
 		err = smtp.SendMail(ss.Server.getAddress(), auth, sender.Email, to, message)
 		if err != nil {
 			w.Header().Set(constants.ContentType, constants.JSON)
-			helper.HTTPError(w, http.StatusBadRequest, "Failed to send mail")
+			helper.HTTPError(r, w, http.StatusBadRequest, "Failed to send mail")
 			return
 		}
 		database := storage.GetStorage(db)
 		err = LogMail(req.Email, database)
 		if err != nil {
 			w.Header().Set(constants.ContentType, constants.JSON)
-			helper.HTTPError(w, http.StatusBadRequest, "Failed to log mail")
+			helper.HTTPError(r, w, http.StatusBadRequest, "Failed to log mail")
 			return
 		}
 
@@ -83,7 +83,7 @@ func (ss *SmtpService) SendMailHandler(db string) http.HandlerFunc {
 		_, res, err := helper.NewResponseBuilder(w, true, constants.SendMailSuccess, objResponse)
 		if err != nil {
 			w.Header().Set(constants.ContentType, constants.JSON)
-			helper.HTTPError(w, http.StatusBadRequest, constants.CannotEncodeResponse)
+			helper.HTTPError(r, w, http.StatusBadRequest, constants.CannotEncodeResponse)
 			return
 		}
 
