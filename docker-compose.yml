@@ -58,28 +58,18 @@ services:
             - postgres
             # - filebeat
 
-    # postgres:
-    #     image: postgres:12.3-alpine
-    #     volumes:
-    #         - db_data:/var/lib/postgresql/data
-    #     ports:
-    #         - 5435:5432
-    #     environment:
-    #         POSTGRES_USER: postgres
-    #         POSTGRES_PASSWORD: password
-    #         POSTGRES_DB: db
-    #     links:
-    #         - postgres
-    # postgres:
-    #     image: postgres:12.3-alpine
-    #     volumes:
-    #         - db_data:/var/lib/postgresql/data
-    #     ports:
-    #         - 5434:5432
-    #     environment:
-    #         POSTGRES_USER: postgres
-    #         POSTGRES_PASSWORD: password
-    #         POSTGRES_DB: db
+    postgres:
+        image: postgres:12.3-alpine
+        volumes:
+            - db_data:/var/lib/postgresql/data
+        ports:
+            - 5435:5432
+        environment:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: password
+            POSTGRES_DB: db
+
+
 
 volumes:
     main_data: {}
