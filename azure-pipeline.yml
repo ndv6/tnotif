@@ -41,6 +41,6 @@ stages:
               chartPath: tnotifchart
               releaseName: tnotif
               install: true
-              overrideValues: "image.tag=$(Build.BuildId),environment.emailAcc=$emailAcc,environment.emailPassword=$emailPassword,environment.db=$db,environment.telegram=$telegram,environment.chatId=$chatId"
+              overrideValues: "image.tag=$(Build.BuildId) --set environment.emailAcc=$emailAcc --set environment.emailPassword=$emailPassword --set environment.db=$db --set environment.telegram=$telegram --set environment.chatId=$chatId"
               waitForExecution: false
         condition: startsWith(variables['Build.SourceBranch'], 'refs/heads/')
