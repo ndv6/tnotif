@@ -23,9 +23,8 @@ func GetEnv(varName string) string {
 	return (os.Getenv(varName))
 }
 
-func HTTPError(r *http.Request, w http.ResponseWriter, status int, errorMessage string) {
+func HTTPError(w http.ResponseWriter, status int, errorMessage string) {
 	w.WriteHeader(status)
-	SendMessageToTelegram(r, status, errorMessage)
 	json.NewEncoder(w).Encode(map[string]string{"error": errorMessage})
 }
 

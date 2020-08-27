@@ -16,6 +16,8 @@ const (
 	InsertFailed            = "Failed to insert to database."
 	InitLogFailed           = "Failed to insert log of this transaction."
 	CannotParseURLParams    = "Failed to parse URL Params"
+	FailedConnectDatabase   = "Failed to connect to database"
+	FailedParseTemplate     = "Failed to parse email template"
 )
 
 // Headers
