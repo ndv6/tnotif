@@ -1,5 +1,9 @@
 trigger:
   - feature/azure-pipeline
+  - develop
+
+pr:
+  - develop
 
 stages:
   - stage:
@@ -39,4 +43,4 @@ stages:
               install: true
               overrideValues: "image.tag=$(Build.BuildId)"
               waitForExecution: false
-        condition: eq(variables['Build.SourceBranch'], 'refs/heads/feature/azure-pipeline')
+        condition: startsWith(variables['Build.SourceBranch'], 'refs/heads/')
