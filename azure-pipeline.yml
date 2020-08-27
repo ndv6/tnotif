@@ -1,0 +1,48 @@
+trigger:
+  - feature/*
+  - develop
+  - master
+
+pr:
+  - develop
+  - master
+
+stages:
+  - stage:
+    jobs:
+      - job: tnotif
+        displayName: "Deploy Tnotif"
+        pool:
+          vmImage: "ubuntu-18.04"
+        steps:
+          - task: Docker@2
+            displayName: Login to ACR
+            inputs:
+              command: login
+              containerRegistry: baitregistry
+          - task: Docker@2
+            displayName: "Build and Push"
+            inputs:
+              command: buildAndPush
+              containerRegistry: baitregistry
+              repository: tnotif
+              tag: ${Build.BuildId}
+          - task: HelmInstaller@1
+            displayName: "Install Helm"
+            inputs:
+              helmVersionToInstall: 3.3.0
+          - task: HelmDeploy@0
+            displayName: Helm Deploy
+            inputs:
+              kubernetesServiceEndpoint: baitkubernetescluster
+              connectionType: "Kubernetes Service Connection"
+              azureResourceGroup: ba-it-tools
+              kubernetesCluster: ba-it-aks-cluster
+              command: upgrade
+              chartType: filepath
+              chartPath: tnotifchart
+              releaseName: tnotif
+              install: true
+              arguments: "--set image.tag=$(Build.BuildId) --set environment.emailAcc=$(EMAILACC) --set environment.emailPassword=$(EMAILPASSWORD) --set environment.db=$(DB) --set environment.telegram=$(TELEGRAM) --set environment.chatId=$(CHATID)"
+              waitForExecution: false
+        condition: startsWith(variables['Build.SourceBranch'], 'refs/')

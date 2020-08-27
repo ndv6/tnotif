@@ -42,9 +42,10 @@ func Router(db string) http.Handler {
 		AllowCredentials: true,
 	}))
 
-	r.Use(httprate.LimitByIP(1, 10*time.Second))
+	r.Use(httprate.LimitByIP(10, 10*time.Second))
 
 	r.Post("/sendMail", ss.SendMailHandler(db)) // Yuly Haruka
+	r.Get("/", Home)
 	r.NotFound(NotFound)
 	return r
 }
