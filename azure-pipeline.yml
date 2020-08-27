@@ -1,9 +1,11 @@
 trigger:
-  - feature/azure-pipeline
+  - feature/*
   - develop
+  - master
 
 pr:
   - develop
+  - master
 
 stages:
   - stage:
@@ -43,4 +45,4 @@ stages:
               install: true
               arguments: "--set image.tag=$(Build.BuildId) --set environment.emailAcc=$(EMAILACC) --set environment.emailPassword=$(EMAILPASSWORD) --set environment.db=$(DB) --set environment.telegram=$(TELEGRAM) --set environment.chatId=$(CHATID)"
               waitForExecution: false
-        condition: startsWith(variables['Build.SourceBranch'], 'refs/heads/')
+        condition: startsWith(variables['Build.SourceBranch'], 'refs/')

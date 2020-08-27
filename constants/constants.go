@@ -30,6 +30,7 @@ const (
 
 // Response Messages
 const (
+	Welcome         = "Welcome to Tnotif"
 	SendMailSuccess = "Send Mail success"
 	SendMailFailed  = "Send Mail failed"
 )
