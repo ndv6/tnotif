@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 services:
     # elasticsearch:
     #     image: docker.elastic.co/elasticsearch/elasticsearch:7.9.0
@@ -6,10 +6,10 @@ services:
     #     environment:
     #       discovery.type: single-node
     #       ES_JAVA_OPTS: "-Xms512m -Xmx512m"
-    #     ports: 
+    #     ports:
     #       - 9200:9200
     #       - 9300:9300
-      
+
     # kibana:
     #     image: docker.elastic.co/kibana/kibana:7.9.0
     #     container_name: kibana
@@ -19,7 +19,7 @@ services:
     #       elasticsearch.hosts: "[\"http://elasticsearch:9200\"]"
     #     depends_on:
     #       - elasticsearch
-    
+
     # filebeat:
     #     image: docker.elastic.co/beats/filebeat:7.9.0
     #     user: root
@@ -27,7 +27,7 @@ services:
     #     environment:
     #       ELASTICSEARCH_HOST: elasticsearch:9200
     #       KIBANA_HOST: kibana:5601
-    #     volumes: 
+    #     volumes:
     #       - ./filebeat.yaml:/usr/share/filebeat/filebeat.yml:ro
     #       - /var/lib/docker/containers:/var/lib/docker/containers:ro
     #       - /var/run/docker.sock:/var/run/docker.sock
@@ -36,11 +36,11 @@ services:
     #     depends_on:
     #       - elasticsearch
     #       - kibana
-    
+
     # heartbeat:
     #     image: docker.elastic.co/beats/heartbeat:7.9.0
     #     container_name: heartbeat
-    #     volumes: 
+    #     volumes:
     #       - ./heartbeat.yml:/usr/share/heartbeat/heartbeat.yml:ro
     #     depends_on:
     #       - elasticsearch
@@ -52,23 +52,35 @@ services:
         working_dir: /workspace/tnotif
         volumes:
             - .:/workspace/tnotif
-        ports: 
+        ports:
             - 8082:8082
         depends_on:
             - postgres
             # - filebeat
 
-    postgres:
-        image: postgres:12.3-alpine
-        volumes:
-            - db_data:/var/lib/postgresql/data
-        ports:
-            - 5435:5432
-        environment:
-            POSTGRES_USER: postgres
-            POSTGRES_PASSWORD: password
-            POSTGRES_DB: db
+    # postgres:
+    #     image: postgres:12.3-alpine
+    #     volumes:
+    #         - db_data:/var/lib/postgresql/data
+    #     ports:
+    #         - 5435:5432
+    #     environment:
+    #         POSTGRES_USER: postgres
+    #         POSTGRES_PASSWORD: password
+    #         POSTGRES_DB: db
+    #     links:
+    #         - postgres
+    # postgres:
+    #     image: postgres:12.3-alpine
+    #     volumes:
+    #         - db_data:/var/lib/postgresql/data
+    #     ports:
+    #         - 5434:5432
+    #     environment:
+    #         POSTGRES_USER: postgres
+    #         POSTGRES_PASSWORD: password
+    #         POSTGRES_DB: db
 
-volumes: 
+volumes:
     main_data: {}
     db_data: {}
