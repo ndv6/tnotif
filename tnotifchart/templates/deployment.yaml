@@ -34,9 +34,9 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-            - name: EMAILACC
+            - name: EMAIL_ACC
               value: {{ .Values.environment.emailAcc | quote }}
-            - name: EMAILPASSWORD
+            - name: EMAIL_PASSWORD
               value: {{ .Values.environment.emailPassword | quote }}
             - name: DB
               value: {{ .Values.environment.db | quote }}
@@ -44,6 +44,8 @@ spec:
               value: {{ .Values.environment.telegram | quote }}
             - name: CHATID
               value: {{ .Values.environment.chatId | quote }}
+            - name: DATABASE_URL
+              value: {{ .Values.environment.databaseUrl | quote }}
           ports:
             - name: http
               containerPort: 8082

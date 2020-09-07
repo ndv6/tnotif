@@ -88,3 +88,4 @@ environment:
   db: ''
   telegram: ''
   chatId: ''
+  databaseUrl: ''
