@@ -53,6 +53,8 @@ func (ss *SmtpService) SendMailHandler(db string) http.HandlerFunc {
 			Token: req.Token,
 		}
 
+		fmt.Println(sender.Email)
+		fmt.Println(sender.Password)
 		subject := "Please verify your email"
 		body, err := ParseTemplate("templates/template.html", data)
 		if err != nil {
