@@ -39,12 +39,13 @@ func (ss *SmtpService) SendMailHandler(db string) http.HandlerFunc {
 			return
 		}
 
-		body, err := ParseTemplate("templates/template.html", templateData{Token: req.Token})
-		if err != nil {
-			w.Header().Set(constants.ContentType, constants.JSON)
-			helper.HTTPError(w, http.StatusInternalServerError, constants.FailedParseTemplate)
-			return
-		}
+		body := fmt.Sprintf("Please verify your email using this token : %v", req.Token)
+		// body, err := ParseTemplate("templates/template.html", templateData{Token: req.Token})
+		// if err != nil {
+		// 	w.Header().Set(constants.ContentType, constants.JSON)
+		// 	helper.HTTPError(w, http.StatusInternalServerError, constants.FailedParseTemplate)
+		// 	return
+		// }
 		// message := CreateEmailMessage(subject, body)
 
 		err = helper.SendMessage(ss.SmtpSender.ApiKey, ss.SmtpSender.Domain, helper.GetEnv("EMAIL_ACC"), req.Email, constants.SubjectEmail, body)
