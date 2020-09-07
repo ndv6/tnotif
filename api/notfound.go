@@ -7,6 +7,6 @@ import (
 )
 
 func NotFound(w http.ResponseWriter, r *http.Request) {
-	helper.HTTPError(r, w, http.StatusNotFound, "Not Found")
+	helper.HTTPError(w, http.StatusNotFound, "Not Found")
 	return
 }
