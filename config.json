@@ -1,4 +1,4 @@
 {
         "addr": ":8082",
-        "database": "host=postgres port=5432 user=postgres password=password dbname=db sslmode=disable"
+        "database": ""
 }

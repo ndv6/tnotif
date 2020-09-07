@@ -14,12 +14,8 @@ type database struct {
 }
 
 func newConnection() database {
-	cfg, err := helper.LoadConfig("config.json")
-	if err != nil {
-		log.Fatal("unable to load configuration config.json")
-	}
-
-	db, err := sql.Open("postgres", cfg.Database)
+	DbURL := helper.GetEnv("DATABASE_URL")
+	db, err := sql.Open("postgres", DbURL)
 	if err != nil {
 		log.Fatal(err)
 	}
