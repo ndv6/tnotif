@@ -89,3 +89,5 @@ environment:
   telegram: ''
   chatId: ''
   databaseUrl: ''
+  apiKey: ''
+  domain: ''

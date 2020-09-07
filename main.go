@@ -5,10 +5,10 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/ndv6/tnotif/api"
 	"github.com/ndv6/tnotif/helper"
 
 	_ "github.com/lib/pq"
-	"github.com/ndv6/tnotif/api"
 )
 
 func main() {

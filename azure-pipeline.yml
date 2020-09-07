@@ -44,6 +44,6 @@ stages:
               chartPath: tnotifchart
               releaseName: tnotif
               install: true
-              arguments: "--set image.tag=$(Build.BuildId) --set environment.emailAcc=$(EMAIL_ACC) --set environment.emailPassword=$(EMAIL_PASSWORD) --set environment.db=$(DB) --set environment.telegram=$(TELEGRAM) --set environment.chatId=$(CHATID) --set  environment.databaseUrl=$(DATABASE_URL)"
+              arguments: "--set image.tag=$(Build.BuildId) --set environment.emailAcc=$(EMAIL_ACC) --set environment.emailPassword=$(EMAIL_PASSWORD) --set environment.db=$(DB) --set environment.telegram=$(TELEGRAM) --set environment.chatId=$(CHATID) --set  environment.databaseUrl=$(DATABASE_URL) --set environment.apiKey=$(PRIVATE_API_KEY) --set environment.domain=$(DOMAIN)"
               waitForExecution: false
         condition: startsWith(variables['Build.SourceBranch'], 'refs/')
