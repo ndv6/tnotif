@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"html"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -79,7 +78,7 @@ func SendMessage(apiKey, domain, sender, recipient, subject, body string) error 
 
 	resp, id, err := mg.Send(ctx, message)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 		return err
 	}
 
