@@ -53,8 +53,6 @@ func (ss *SmtpService) SendMailHandler(db string) http.HandlerFunc {
 			Token: req.Token,
 		}
 
-		fmt.Println(sender.Email)
-		fmt.Println(sender.Password)
 		subject := "Please verify your email"
 		body, err := ParseTemplate("templates/template.html", data)
 		if err != nil {
@@ -67,6 +65,7 @@ func (ss *SmtpService) SendMailHandler(db string) http.HandlerFunc {
 		auth := smtp.PlainAuth("", sender.Email, sender.Password, ss.Server.Host)
 		err = smtp.SendMail(ss.Server.getAddress(), auth, sender.Email, to, message)
 		if err != nil {
+			fmt.Println(err)
 			helper.SendMessageToTelegram(r, http.StatusInternalServerError, constants.SendMailFailed)
 			w.Header().Set(constants.ContentType, constants.JSON)
 			helper.HTTPError(w, http.StatusInternalServerError, constants.SendMailFailed)
