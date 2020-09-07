@@ -15,7 +15,7 @@ import (
 	"github.com/ndv6/tnotif/models"
 )
 
-type smtpEmail struct {
+type SMTPEmail struct {
 	ApiKey string
 	Domain string
 }
@@ -25,8 +25,8 @@ type templateData struct {
 }
 
 type SmtpService struct {
-	SmtpEmail smtpEmail
-	Template  string
+	SmtpSender SMTPEmail
+	Template   string
 }
 
 func (ss *SmtpService) SendMailHandler(db string) http.HandlerFunc {
@@ -39,11 +39,6 @@ func (ss *SmtpService) SendMailHandler(db string) http.HandlerFunc {
 			return
 		}
 
-		mailgun := smtpEmail{
-			ApiKey: helper.GetEnv("PRIVATE_API_KEY"),
-			Domain: helper.GetEnv("DOMAIN"),
-		}
-
 		body, err := ParseTemplate("templates/template.html", templateData{Token: req.Token})
 		if err != nil {
 			w.Header().Set(constants.ContentType, constants.JSON)
@@ -52,7 +47,7 @@ func (ss *SmtpService) SendMailHandler(db string) http.HandlerFunc {
 		}
 		// message := CreateEmailMessage(subject, body)
 
-		status, err := helper.SendMessage(mailgun.ApiKey, mailgun.Domain, helper.GetEnv("EMAIL_ACC"), req.Email, constants.SubjectEmail, body)
+		err = helper.SendMessage(ss.SmtpSender.ApiKey, ss.SmtpSender.Domain, helper.GetEnv("EMAIL_ACC"), req.Email, constants.SubjectEmail, body)
 		if err != nil {
 			helper.SendMessageToTelegram(r, http.StatusInternalServerError, constants.SendMailFailed)
 			w.Header().Set(constants.ContentType, constants.JSON)

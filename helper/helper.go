@@ -70,7 +70,7 @@ func SendMessageToTelegram(r *http.Request, status int, errorMessage string) err
 	return nil
 }
 
-func SendMessage(apiKey, domain, sender, recipient, subject, body string) (bool, error) {
+func SendMessage(apiKey, domain, sender, recipient, subject, body string) error {
 	mg := mailgun.NewMailgun(domain, apiKey)
 	message := mg.NewMessage(sender, subject, body, recipient)
 
@@ -80,9 +80,9 @@ func SendMessage(apiKey, domain, sender, recipient, subject, body string) (bool,
 	resp, id, err := mg.Send(ctx, message)
 	if err != nil {
 		log.Fatal(err)
-		return false, err
+		return err
 	}
 
 	fmt.Printf("ID: %s Resp: %s\n", id, resp)
-	return true, nil
+	return nil
 }
