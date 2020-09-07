@@ -8,26 +8,18 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
 	"github.com/go-chi/httprate"
+	"github.com/ndv6/tnotif/helper"
 )
 
 const (
 	template_file = "templates/template.html"
 )
 
-type SmtpServer struct {
-	Host string
-	Port string
-}
-
-func (s *SmtpServer) getAddress() string {
-	return s.Host + ":" + s.Port
-}
-
 func Router(db string) http.Handler {
 	ss := SmtpService{
-		Server: SmtpServer{
-			Host: "smtp.gmail.com",
-			Port: "587",
+		SmtpSender: SMTPEmail{
+			ApiKey: helper.GetEnv("PRIVATE_API_KEY"),
+			Domain: helper.GetEnv("DOMAIN"),
 		},
 		Template: template_file,
 	}

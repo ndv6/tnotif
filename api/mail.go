@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
-	"net/smtp"
 	"time"
 
 	"github.com/ndv6/tnotif/constants"
@@ -16,9 +15,9 @@ import (
 	"github.com/ndv6/tnotif/models"
 )
 
-type smtpEmail struct {
-	Email    string
-	Password string
+type SMTPEmail struct {
+	ApiKey string
+	Domain string
 }
 
 type templateData struct {
@@ -26,8 +25,8 @@ type templateData struct {
 }
 
 type SmtpService struct {
-	Server   SmtpServer
-	Template string
+	SmtpSender SMTPEmail
+	Template   string
 }
 
 func (ss *SmtpService) SendMailHandler(db string) http.HandlerFunc {
@@ -40,37 +39,23 @@ func (ss *SmtpService) SendMailHandler(db string) http.HandlerFunc {
 			return
 		}
 
-		sender := smtpEmail{
-			Email:    helper.GetEnv("EMAIL_ACC"),
-			Password: helper.GetEnv("EMAIL_PASSWORD"),
-		}
+		body := fmt.Sprintf("Please verify your email using this token : %v", req.Token)
+		// body, err := ParseTemplate("templates/template.html", templateData{Token: req.Token})
+		// if err != nil {
+		// 	w.Header().Set(constants.ContentType, constants.JSON)
+		// 	helper.HTTPError(w, http.StatusInternalServerError, constants.FailedParseTemplate)
+		// 	return
+		// }
+		// message := CreateEmailMessage(subject, body)
 
-		to := []string{
-			req.Email,
-		}
-
-		data := templateData{
-			Token: req.Token,
-		}
-
-		subject := "Please verify your email"
-		body, err := ParseTemplate("templates/template.html", data)
+		err = helper.SendMessage(ss.SmtpSender.ApiKey, ss.SmtpSender.Domain, helper.GetEnv("EMAIL_ACC"), req.Email, constants.SubjectEmail, body)
 		if err != nil {
-			w.Header().Set(constants.ContentType, constants.JSON)
-			helper.HTTPError(w, http.StatusInternalServerError, constants.FailedParseTemplate)
-			return
-		}
-		message := CreateEmailMessage(subject, body)
-
-		auth := smtp.PlainAuth("", sender.Email, sender.Password, ss.Server.Host)
-		err = smtp.SendMail(ss.Server.getAddress(), auth, sender.Email, to, message)
-		if err != nil {
-			fmt.Println(err)
 			helper.SendMessageToTelegram(r, http.StatusInternalServerError, constants.SendMailFailed)
 			w.Header().Set(constants.ContentType, constants.JSON)
 			helper.HTTPError(w, http.StatusInternalServerError, constants.SendMailFailed)
 			return
 		}
+
 		database := storage.GetStorage(db)
 		err = LogMail(req.Email, database)
 		if err != nil {

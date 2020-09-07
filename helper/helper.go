@@ -2,6 +2,7 @@ package helper
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"html"
@@ -11,6 +12,7 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
+	mailgun "github.com/mailgun/mailgun-go/v4"
 )
 
 type Config struct {
@@ -64,5 +66,22 @@ func SendMessageToTelegram(r *http.Request, status int, errorMessage string) err
 	}
 
 	fmt.Println(resp)
+	return nil
+}
+
+func SendMessage(apiKey, domain, sender, recipient, subject, body string) error {
+	mg := mailgun.NewMailgun(domain, apiKey)
+	message := mg.NewMessage(sender, subject, body, recipient)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	resp, id, err := mg.Send(ctx, message)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	fmt.Printf("ID: %s Resp: %s\n", id, resp)
 	return nil
 }

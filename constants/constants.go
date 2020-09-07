@@ -36,3 +36,7 @@ const (
 	SendMailSuccess = "Send Mail success"
 	SendMailFailed  = "Send Mail failed"
 )
+
+const (
+	SubjectEmail = "Please verify your email!"
+)

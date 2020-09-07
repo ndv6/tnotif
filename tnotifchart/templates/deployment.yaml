@@ -46,6 +46,10 @@ spec:
               value: {{ .Values.environment.chatId | quote }}
             - name: DATABASE_URL
               value: {{ .Values.environment.databaseUrl | quote }}
+            - name: PRIVATE_API_KEY
+              value: {{ .Values.environment.apiKey | quote }}
+            - name: DOMAIN
+              value: {{ .Values.environment.domain | quote }}
           ports:
             - name: http
               containerPort: 8082
